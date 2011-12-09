@@ -5,7 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jabbot.TwitterNotifierSproc
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "references", "references", "{82032A6E-0779-4D32-AFD6-54D7D6959B27}"
 	ProjectSection(SolutionItems) = preProject
-		references\Jabbot.dll = references\Jabbot.dll
 		references\Jabbot.pdb = references\Jabbot.pdb
 	EndProjectSection
 EndProject

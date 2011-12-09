@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="TwitterNotifierSprocket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserNotificationModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
