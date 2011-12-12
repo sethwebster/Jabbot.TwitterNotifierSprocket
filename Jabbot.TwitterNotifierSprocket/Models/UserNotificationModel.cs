@@ -8,6 +8,10 @@ namespace Jabbot.TwitterNotifierSprocket.Models
 {
     public class User
     {
+        public User()
+        {
+            EnableNotifications = true;
+        }
         [Key]
         public int UserId { get; set; }
         public string JabbrUserName { get; set; }

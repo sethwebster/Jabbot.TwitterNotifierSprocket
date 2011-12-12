@@ -17,9 +17,9 @@ namespace Jabbot.TwitterNotifierSprocket
     public class TwitterNotifierSprocket : ISprocket
     {
         private static readonly Regex _usernameMatchRegex = new Regex(@"(@\w+)");
-        private static readonly string _tweetFormat = "{0}, you were just mentioned by @{1} here http://jabbr.net/#/rooms/{2}.";
+        private static readonly string _tweetFormat = "@{0}, you were just mentioned by @{1} here http://jabbr.net/#/rooms/{2}.";
         private ITwitterNotifierSprocketRepository _database;
-
+        private bool _isDisabled = false;
         public TwitterNotifierSprocket()
             : this(new TwitterNotifierSprocketRepository())
         {
@@ -38,6 +38,7 @@ namespace Jabbot.TwitterNotifierSprocket
                 if (!HandleCommand(message, bot))
                 {
                     var twitterUsers = GetUserNamesFromMessage(message.Content);
+                    var user = FetchOrCreateUser(message.FromUser);
                     if (twitterUsers.Count() > 0)
                     {
                         foreach (var u in twitterUsers)
@@ -47,7 +48,7 @@ namespace Jabbot.TwitterNotifierSprocket
                                 TweetSharp.TwitterService svc = new TwitterService(GetClientInfo());
                                 svc.AuthenticateWith(ConfigurationManager.AppSettings["User.Token"],
                                     ConfigurationManager.AppSettings["User.TokenSecret"]);
-                                svc.SendTweet(String.Format(_tweetFormat, u.ScreenName, message.FromUser, message.Room));
+                                svc.SendTweet(String.Format(_tweetFormat, u.ScreenName, String.IsNullOrEmpty(user.TwitterUserName) ? user.JabbrUserName : user.TwitterUserName, message.Room));
                                 MarkUserNotified(u.ScreenName);
                             }
                         }
@@ -71,32 +72,108 @@ namespace Jabbot.TwitterNotifierSprocket
             string[] args = message.Content
                 .ToLower()
                 .Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            if (args.Length > 0 && args[0] == "twitterbot?")
+            if (args.Length > 0 && (args[0] == "twitterbot?" || args[0] == "@twitterbot?"))
             {
                 string command = args.Length > 1 ? args[1] : string.Empty;
                 args = args.Skip(2).ToArray();
-                if (string.IsNullOrEmpty(command) ||
-                    command.Equals("help", StringComparison.OrdinalIgnoreCase))
+                if (!HandleAdminCommand(command, args, bot, message))
                 {
-                    return HandleHelp(args, bot, message);
+                    if (!_isDisabled)
+                    {
+                        if (command.Equals("twittername", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return HandleTwitterName(args, bot, message);
+                        }
+                        if (command.Equals("on", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return HandleOn(args, bot, message);
+                        }
+                        if (command.Equals("off", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return HandleOff(args, bot, message);
+                        }
+                        if (command.Equals("join", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return HandleJoin(args, bot, message);
+                        }
+                    }
                 }
-                if (command.Equals("twittername", StringComparison.OrdinalIgnoreCase))
+                else
                 {
-                    return HandleTwitterName(args, bot, message);
-                }
-                if (command.Equals("on", StringComparison.OrdinalIgnoreCase))
-                {
-                    return HandleOn(args, bot, message);
-                }
-                if (command.Equals("off", StringComparison.OrdinalIgnoreCase))
-                {
-                    return HandleOff(args, bot, message);
+                    return true;
                 }
                 bot.PrivateReply(message.FromUser, "Try twitterbot? help for commands");
             }
             return false;
         }
 
+        private bool HandleAdminCommand(string command, string[] args, Bot bot, ChatMessage message)
+        {
+            if (string.IsNullOrEmpty(command) ||
+                   command.Equals("help", StringComparison.OrdinalIgnoreCase))
+            {
+                return HandleHelp(args, bot, message);
+            }
+            if (command.Equals("shutdown", StringComparison.OrdinalIgnoreCase))
+            {
+                return HandleShutDown(args, bot, message);
+            }
+            if (command.Equals("startup", StringComparison.OrdinalIgnoreCase))
+            {
+                return HandleStartUp(args, bot, message);
+            }
+            return false;
+        }
+
+        private bool HandleShutDown(string[] args, Bot bot, ChatMessage message)
+        {
+            if (message.FromUser == "sethwebster")
+            {
+                _isDisabled = true;
+                bot.PrivateReply(message.FromUser, "I have been disabled.");
+            }
+            else
+            {
+                bot.Reply(message.FromUser, "You are not the boss of me", message.Room);
+            }
+            return true;
+        }
+
+        private bool HandleStartUp(string[] args, Bot bot, ChatMessage message)
+        {
+            if (message.FromUser == "sethwebster")
+            {
+                _isDisabled = false;
+
+                bot.PrivateReply(message.FromUser, "I have been enabled.");
+            }
+            else
+            {
+                bot.Reply(message.FromUser, "You are not the boss of me", message.Room);
+            }
+            return true;
+        }
+
+        private bool HandleJoin(string[] args, Bot bot, ChatMessage message)
+        {
+            if (args.Length == 0)
+            {
+                bot.PrivateReply(message.FromUser, "You must specify a room to join");
+            }
+            else
+            {
+                try
+                {
+                    bot.Join(args[0]);
+                    bot.PrivateReply(message.FromUser, "OK - I'm now in " + args[0]);
+                }
+                catch (Exception e)
+                {
+                    bot.PrivateReply(message.FromUser, e.GetBaseException().Message);
+                }
+            }
+            return true;
+        }
         private bool HandleOn(string[] args, Bot bot, ChatMessage message)
         {
             var user = FetchOrCreateUser(message.FromUser);
@@ -118,19 +195,30 @@ namespace Jabbot.TwitterNotifierSprocket
         private bool HandleHelp(string[] args, Bot bot, ChatMessage message)
         {
             bot.PrivateReply(message.FromUser, "Jabbot Twitter Sprocket - " + Assembly.GetAssembly(this.GetType()).GetName().Version.ToString());
+            bot.PrivateReply(message.FromUser, string.Format("Status: {0}", _isDisabled ? "Disabled" : "Enabled"));
             bot.PrivateReply(message.FromUser, "Say:");
-            bot.PrivateReply(message.FromUser, "twittername [TwitterScreenName] - Sets your Twitter user name");
-            bot.PrivateReply(message.FromUser, "off - turn off Twitter notifications when you are mentioned");
-            bot.PrivateReply(message.FromUser, "on - turn Twitter notifications on for when you are mentioned");
+            bot.PrivateReply(message.FromUser, "twittername [TwitterScreenName] - Displays or Sets your Twitter user name");
+            bot.PrivateReply(message.FromUser, "off - turn OFF Twitter notifications when you are mentioned");
+            bot.PrivateReply(message.FromUser, "on - turn ON Twitter notifications on for when you are mentioned");
+            bot.PrivateReply(message.FromUser, "join [roomname] - ask me to join a room to watch for mentions");
+            bot.PrivateReply(message.FromUser, "startup - start me watching for mentions (for everyone)");
+            bot.PrivateReply(message.FromUser, "shutdown - stop me from watching for mentions (for everyone)");
             return true;
         }
 
         private bool HandleTwitterName(string[] args, Bot bot, ChatMessage message)
         {
             if (args.Length == 0)
-                throw new CommandException("You must supply a twitter user name");
-            SetTwitterUserName(message.FromUser, args[0]);
-            bot.PrivateReply(message.FromUser, String.Format("Your Twitter user name is now {0}", args[0]));
+            {
+                var user = FetchOrCreateUser(message.FromUser);
+                bot.PrivateReply(message.FromUser, String.Format("Your Twitter user is {0}",
+                    String.IsNullOrEmpty(user.TwitterUserName) ? "<empty>" : user.TwitterUserName));
+            }
+            else
+            {
+                SetTwitterUserName(message.FromUser, args[0]);
+                bot.PrivateReply(message.FromUser, String.Format("Your Twitter user name is now {0}", args[0]));
+            }
             return true;
         }
 
@@ -153,20 +241,19 @@ namespace Jabbot.TwitterNotifierSprocket
                     JabbrUserName = forUser
                 };
                 _database.Users.Add(user);
+                _database.SaveChanges();
             }
             return user;
         }
 
         IEnumerable<TwitterUser> GetUserNamesFromMessage(string message)
         {
-            return _usernameMatchRegex.Match(message)
-                                .Groups
-                                .Cast<Group>()
-                                .Skip(1)
+            return _usernameMatchRegex.Matches(message)
+                                .Cast<Match>()
                                 .Select(g =>
                                     new TwitterUser()
                                     {
-                                        ScreenName = FetchOrCreateUser(g.Value).TwitterUserName
+                                        ScreenName = FetchOrCreateUser(g.Value.Replace("@", "")).TwitterUserName
                                     })
                                 .Where(v => !String.IsNullOrEmpty(v.ScreenName));
         }
