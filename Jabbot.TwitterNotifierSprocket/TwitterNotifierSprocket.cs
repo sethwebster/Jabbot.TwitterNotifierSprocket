@@ -62,18 +62,18 @@ namespace Jabbot.TwitterNotifierSprocket
             }
             catch (Exception e)
             {
-                throw e;
+                bot.PrivateReply(message.FromUser, e.GetBaseException().Message);
             }
             return false;
         }
 
         private bool HandleCommand(ChatMessage message, Bot bot)
         {
-            string[] args = message.Content
-                .ToLower()
-                .Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            if (args.Length > 0 && (args[0] == "twitterbot?" || args[0] == "@twitterbot?"))
+
+            if (message.Content.StartsWith("twitterbot?") || message.Content.StartsWith("@twitterbot?"))
             {
+                string[] args = message.Content
+                    .Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 string command = args.Length > 1 ? args[1] : string.Empty;
                 args = args.Skip(2).ToArray();
                 if (!HandleAdminCommand(command, args, bot, message))
