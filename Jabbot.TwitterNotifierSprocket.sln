@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jabbot.TwitterNotifierSprocket", "Jabbot.TwitterNotifierSprocket\Jabbot.TwitterNotifierSprocket.csproj", "{76D43348-ABF4-422D-A06E-92E4F484481F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "references", "references", "{82032A6E-0779-4D32-AFD6-54D7D6959B27}"
-	ProjectSection(SolutionItems) = preProject
-		references\Jabbot.pdb = references\Jabbot.pdb
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
