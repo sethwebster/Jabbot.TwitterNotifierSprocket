@@ -134,6 +134,11 @@ namespace Jabbot.TwitterNotifierSprocket
 
         private bool HandleUserCommand(string command, string[] args, Bot bot, ChatMessage message)
         {
+            if (string.IsNullOrEmpty(command) ||
+                       command.Equals("help", StringComparison.OrdinalIgnoreCase))
+            {
+                return HandleHelp(args, bot, message);
+            }
             if (command.Equals("twittername", StringComparison.OrdinalIgnoreCase))
             {
                 return HandleTwitterName(args, bot, message);
@@ -169,11 +174,6 @@ namespace Jabbot.TwitterNotifierSprocket
         {
             if (message.FromUser == "sethwebster")
             {
-                if (string.IsNullOrEmpty(command) ||
-                       command.Equals("help", StringComparison.OrdinalIgnoreCase))
-                {
-                    return HandleHelp(args, bot, message);
-                }
                 if (command.Equals("shutdown", StringComparison.OrdinalIgnoreCase))
                 {
                     return HandleShutDown(args, bot, message);
