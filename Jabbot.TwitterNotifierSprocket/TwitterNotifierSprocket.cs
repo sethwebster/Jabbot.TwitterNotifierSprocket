@@ -49,6 +49,7 @@ namespace Jabbot.TwitterNotifierSprocket
             try
             {
                 RecordActivity(message.FromUser);
+                InviteUserIfNeccessary(message.FromUser, bot);
                 if (!HandleCommand(message, bot))
                 {
                     var twitterUsers = GetUserNamesFromMessage(message.Content);
@@ -79,6 +80,21 @@ namespace Jabbot.TwitterNotifierSprocket
                 bot.PrivateReply(message.FromUser, e.GetBaseException().Message);
             }
             return false;
+        }
+
+        private void InviteUserIfNeccessary(string forUser, Bot bot)
+        {
+            var user = FetchOrCreateUser(forUser);
+            if (String.IsNullOrWhiteSpace(user.TwitterUserName) &&
+                !user.DisableInvites
+                && (DateTime.Now - user.LastInviteDate).TotalDays > 1)
+            {
+                bot.PrivateReply(forUser, "If you're using Twitter, I can notify you when you're mentioned and away.");
+                bot.PrivateReply(forUser, "-- to tell me your Twitter user name use: @twitterbot? twittername [your-twitter-username]");
+                bot.PrivateReply(forUser, "-- to prevent me from reminding you about this: @twitterbot? disableinvite");
+                user.LastInviteDate = DateTime.Now;
+                _database.SaveChanges();
+            }
         }
 
         private void RecordActivity(string fromUser)
@@ -134,71 +150,103 @@ namespace Jabbot.TwitterNotifierSprocket
             {
                 return HandleJoin(args, bot, message);
             }
+            if (command.Equals("disableinvite", StringComparison.OrdinalIgnoreCase))
+            {
+                return HandleDisableInvite(args, bot, message);
+            }
             return false;
+        }
+
+        private bool HandleDisableInvite(string[] args, Bot bot, ChatMessage message)
+        {
+            var user = FetchOrCreateUser(message.FromUser);
+            user.DisableInvites = true;
+            _database.SaveChanges();
+            return true;
         }
 
         private bool HandleAdminCommand(string command, string[] args, Bot bot, ChatMessage message)
         {
-            if (string.IsNullOrEmpty(command) ||
-                   command.Equals("help", StringComparison.OrdinalIgnoreCase))
+            if (message.FromUser == "sethwebster")
             {
-                return HandleHelp(args, bot, message);
+                if (string.IsNullOrEmpty(command) ||
+                       command.Equals("help", StringComparison.OrdinalIgnoreCase))
+                {
+                    return HandleHelp(args, bot, message);
+                }
+                if (command.Equals("shutdown", StringComparison.OrdinalIgnoreCase))
+                {
+                    return HandleShutDown(args, bot, message);
+                }
+                if (command.Equals("startup", StringComparison.OrdinalIgnoreCase))
+                {
+                    return HandleStartUp(args, bot, message);
+                }
+                if (command.Equals("listusers", StringComparison.OrdinalIgnoreCase))
+                {
+                    return HandleListUsers(args, bot, message);
+                }
+                if (command.Equals("twitteruserfor", StringComparison.OrdinalIgnoreCase))
+                {
+                    return HandleTwitterUserFor(args, bot, message);
+                }
             }
-            if (command.Equals("shutdown", StringComparison.OrdinalIgnoreCase))
+            else
             {
-                return HandleShutDown(args, bot, message);
-            }
-            if (command.Equals("startup", StringComparison.OrdinalIgnoreCase))
-            {
-                return HandleStartUp(args, bot, message);
-            }
-            if (command.Equals("listusers", StringComparison.OrdinalIgnoreCase))
-            {
-                return HandleListUsers(args, bot, message);
+                bot.Reply(message.FromUser, "You are not the boss of me!", message.Room);
+                return true;
             }
             return false;
         }
 
-        private bool HandleShutDown(string[] args, Bot bot, ChatMessage message)
+        private bool HandleTwitterUserFor(string[] args, Bot bot, ChatMessage message)
         {
-            if (message.FromUser == "sethwebster")
+            if (args.Length == 2)
             {
-                _isDisabled = true;
-                bot.PrivateReply(message.FromUser, "I have been disabled.");
+                string forUserName = args[0];
+                string twitterUserName = args[1];
+                var userFor = FetchOrCreateUser(forUserName);
+                if (userFor != null)
+                {
+                    userFor.TwitterUserName = twitterUserName;
+                    _database.SaveChanges();
+                    bot.PrivateReply(message.FromUser, String.Format("{0}'s twitter user name is now {1}", userFor.JabbrUserName, userFor.TwitterUserName));
+                }
+                else
+                {
+                    bot.PrivateReply(message.FromUser, String.Format("User {0} was not found", args[0]));
+                }
             }
             else
             {
-                bot.Reply(message.FromUser, "You are not the boss of me", message.Room);
+                bot.PrivateReply(message.FromUser, "twitteruserfor [user] [twitterscreenname]");
             }
+            return true;
+        }
+
+        private bool HandleShutDown(string[] args, Bot bot, ChatMessage message)
+        {
+            _isDisabled = true;
+            bot.PrivateReply(message.FromUser, "I have been disabled.");
             return true;
         }
 
         private bool HandleStartUp(string[] args, Bot bot, ChatMessage message)
         {
-            if (message.FromUser == "sethwebster")
-            {
-                _isDisabled = false;
+            _isDisabled = false;
 
-                bot.PrivateReply(message.FromUser, "I have been enabled.");
-            }
-            else
-            {
-                bot.Reply(message.FromUser, "You are not the boss of me", message.Room);
-            }
+            bot.PrivateReply(message.FromUser, "I have been enabled.");
             return true;
         }
 
         private bool HandleListUsers(string[] args, Bot bot, ChatMessage message)
         {
-            if (message.FromUser == "sethwebster")
-            {
-                var users = _database.Users.OrderBy(u => u.JabbrUserName).ToArray().Select(
-                    u => String.Format(
-                        "{0} <{1}>", u.JabbrUserName,
-                        string.IsNullOrEmpty(u.TwitterUserName) ? "empty" : "@" + u.TwitterUserName)
-                    );
-                bot.PrivateReply(message.FromUser, String.Join(", ", users.ToArray()));
-            }
+            var users = _database.Users.OrderBy(u => u.JabbrUserName).ToArray().Select(
+                u => String.Format(
+                    "{0} <{1}>", u.JabbrUserName,
+                    string.IsNullOrEmpty(u.TwitterUserName) ? "empty" : "@" + u.TwitterUserName)
+                );
+            bot.PrivateReply(message.FromUser, String.Join(", ", users.ToArray()));
             return true;
         }
 

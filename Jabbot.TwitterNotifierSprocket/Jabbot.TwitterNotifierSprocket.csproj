@@ -38,7 +38,7 @@
     <Reference Include="EntityFramework.CodeFirst.TestHelpers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.CodeFirst.TestHelpers.0.1.3\lib\EntityFramework.CodeFirst.TestHelpers.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework.Migrations">
+    <Reference Include="EntityFramework.Migrations, Version=0.8.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.Migrations.0.8.0.0\lib\net40\EntityFramework.Migrations.dll</HintPath>
     </Reference>
     <Reference Include="Hammock">
@@ -58,10 +58,6 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Entity" />
-    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\SqlServerCompact.4.0.8482.1\lib\System.Data.SqlServerCe.dll</HintPath>
-    </Reference>
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -84,6 +80,18 @@
     <Compile Include="Migrations\201112131428159_Add-Activity-Time.Designer.cs">
       <DependentUpon>201112131428159_Add-Activity-Time.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201112131825515_Add-Invite-Fields.cs" />
+    <Compile Include="Migrations\201112131825515_Add-Invite-Fields.Designer.cs">
+      <DependentUpon>201112131825515_Add-Invite-Fields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201112131948322_new-field.cs" />
+    <Compile Include="Migrations\201112131948322_new-field.Designer.cs">
+      <DependentUpon>201112131948322_new-field.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201112132059098_remove-new-field.cs" />
+    <Compile Include="Migrations\201112132059098_remove-new-field.Designer.cs">
+      <DependentUpon>201112132059098_remove-new-field.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ITwitterNotifierSprocketRepository.cs" />
     <Compile Include="Models\TwitterNotifierSprocketRepository.cs" />
@@ -101,10 +109,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
-if not exist "$(TargetDir)x86" md "$(TargetDir)x86"
-xcopy /s /y "$(SolutionDir)packages\SqlServerCompact.4.0.8482.1\NativeBinaries\x86\*.*" "$(TargetDir)x86"
-if not exist "$(TargetDir)amd64" md "$(TargetDir)amd64"
-xcopy /s /y "$(SolutionDir)packages\SqlServerCompact.4.0.8482.1\NativeBinaries\amd64\*.*" "$(TargetDir)amd64"</PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

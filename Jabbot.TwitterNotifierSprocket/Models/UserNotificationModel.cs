@@ -12,6 +12,7 @@ namespace Jabbot.TwitterNotifierSprocket.Models
         {
             EnableNotifications = true;
             LastActivity = DateTime.Now.AddMinutes(-60);
+            LastInviteDate = DateTime.Now.AddDays(-1);
         }
         [Key]
         public int UserId { get; set; }
@@ -20,5 +21,7 @@ namespace Jabbot.TwitterNotifierSprocket.Models
         public DateTime LastNotification { get; set; }
         public bool EnableNotifications { get; set; }
         public DateTime LastActivity { get; set; }
+        public DateTime LastInviteDate { get; set; }
+        public bool DisableInvites { get; set; }
     }
 }
