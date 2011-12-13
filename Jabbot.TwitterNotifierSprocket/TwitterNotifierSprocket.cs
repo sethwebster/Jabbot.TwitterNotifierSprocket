@@ -69,7 +69,6 @@ namespace Jabbot.TwitterNotifierSprocket
 
         private bool HandleCommand(ChatMessage message, Bot bot)
         {
-
             if (message.Content.StartsWith("twitterbot?") || message.Content.StartsWith("@twitterbot?"))
             {
                 string[] args = message.Content
@@ -80,29 +79,38 @@ namespace Jabbot.TwitterNotifierSprocket
                 {
                     if (!_isDisabled)
                     {
-                        if (command.Equals("twittername", StringComparison.OrdinalIgnoreCase))
+                        if (!HandleUserCommand(command, args, bot, message))
                         {
-                            return HandleTwitterName(args, bot, message);
-                        }
-                        if (command.Equals("on", StringComparison.OrdinalIgnoreCase))
-                        {
-                            return HandleOn(args, bot, message);
-                        }
-                        if (command.Equals("off", StringComparison.OrdinalIgnoreCase))
-                        {
-                            return HandleOff(args, bot, message);
-                        }
-                        if (command.Equals("join", StringComparison.OrdinalIgnoreCase))
-                        {
-                            return HandleJoin(args, bot, message);
+                            bot.PrivateReply(message.FromUser, "Try twitterbot? help for commands");
                         }
                     }
+                    else
+                    {
+                        bot.PrivateReply(message.FromUser, "TwitterBot is currently disabled.");
+                    }
                 }
-                else
-                {
-                    return true;
-                }
-                bot.PrivateReply(message.FromUser, "Try twitterbot? help for commands");
+                return true;
+            }
+            return false;
+        }
+
+        private bool HandleUserCommand(string command, string[] args, Bot bot, ChatMessage message)
+        {
+            if (command.Equals("twittername", StringComparison.OrdinalIgnoreCase))
+            {
+                return HandleTwitterName(args, bot, message);
+            }
+            if (command.Equals("on", StringComparison.OrdinalIgnoreCase))
+            {
+                return HandleOn(args, bot, message);
+            }
+            if (command.Equals("off", StringComparison.OrdinalIgnoreCase))
+            {
+                return HandleOff(args, bot, message);
+            }
+            if (command.Equals("join", StringComparison.OrdinalIgnoreCase))
+            {
+                return HandleJoin(args, bot, message);
             }
             return false;
         }
@@ -121,6 +129,10 @@ namespace Jabbot.TwitterNotifierSprocket
             if (command.Equals("startup", StringComparison.OrdinalIgnoreCase))
             {
                 return HandleStartUp(args, bot, message);
+            }
+            if (command.Equals("listusers", StringComparison.OrdinalIgnoreCase))
+            {
+                return HandleListUsers(args, bot, message);
             }
             return false;
         }
@@ -154,6 +166,20 @@ namespace Jabbot.TwitterNotifierSprocket
             return true;
         }
 
+        private bool HandleListUsers(string[] args, Bot bot, ChatMessage message)
+        {
+            if (message.FromUser == "sethwebster")
+            {
+                var users = _database.Users.OrderBy(u => u.JabbrUserName).ToArray().Select(
+                    u => String.Format(
+                        "{0} <{1}>", u.JabbrUserName,
+                        string.IsNullOrEmpty(u.TwitterUserName) ? "empty" : "@" + u.TwitterUserName)
+                    );
+                bot.PrivateReply(message.FromUser, String.Join(", ", users.ToArray()));
+            }
+            return true;
+        }
+
         private bool HandleJoin(string[] args, Bot bot, ChatMessage message)
         {
             if (args.Length == 0)
@@ -174,6 +200,7 @@ namespace Jabbot.TwitterNotifierSprocket
             }
             return true;
         }
+
         private bool HandleOn(string[] args, Bot bot, ChatMessage message)
         {
             var user = FetchOrCreateUser(message.FromUser);
