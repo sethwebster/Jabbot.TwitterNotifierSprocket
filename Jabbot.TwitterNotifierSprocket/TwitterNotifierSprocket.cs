@@ -11,6 +11,7 @@ using Jabbot.TwitterNotifierSprocket.Models;
 using Jabbot.Models;
 using System.Reflection;
 using System.Data.Entity;
+using System.Data.Entity.Migrations;
 
 namespace Jabbot.TwitterNotifierSprocket
 {
@@ -29,12 +30,25 @@ namespace Jabbot.TwitterNotifierSprocket
         public TwitterNotifierSprocket(ITwitterNotifierSprocketRepository database)
         {
             this._database = database;
+            DoMigrations();
+        }
+
+        private void DoMigrations()
+        {
+            // Get the Jabbr connection string
+            var connectionString = ConfigurationManager.ConnectionStrings["Jabbr"];
+
+            // Only run migrations for SQL server (Sql ce not supported as yet)
+            var settings = new Migrations.Configuration();
+            var migrator = new DbMigrator(settings);
+            migrator.Update();
         }
 
         public bool Handle(ChatMessage message, Bot bot)
         {
             try
             {
+                RecordActivity(message.FromUser);
                 if (!HandleCommand(message, bot))
                 {
                     var twitterUsers = GetUserNamesFromMessage(message.Content);
@@ -67,6 +81,13 @@ namespace Jabbot.TwitterNotifierSprocket
             return false;
         }
 
+        private void RecordActivity(string fromUser)
+        {
+            var user = FetchOrCreateUser(fromUser);
+            user.LastActivity = DateTime.Now;
+            _database.SaveChanges();
+        }
+
         private bool HandleCommand(ChatMessage message, Bot bot)
         {
             if (message.Content.StartsWith("twitterbot?") || message.Content.StartsWith("@twitterbot?"))
@@ -81,6 +102,7 @@ namespace Jabbot.TwitterNotifierSprocket
                     {
                         if (!HandleUserCommand(command, args, bot, message))
                         {
+
                             bot.PrivateReply(message.FromUser, "Try twitterbot? help for commands");
                         }
                     }
@@ -312,7 +334,9 @@ namespace Jabbot.TwitterNotifierSprocket
         private bool ShouldNotifyUser(string UserName)
         {
             var user = _database.Users.FirstOrDefault(u => u.JabbrUserName == UserName);
-            return user == null || (DateTime.Now - user.LastNotification).TotalMinutes >= 60 && user.EnableNotifications;
+            return user == null || (user.EnableNotifications &&
+                ((DateTime.Now - user.LastNotification).TotalMinutes >= 60 &&
+                (DateTime.Now - user.LastActivity).TotalMinutes > 5));
         }
     }
 
