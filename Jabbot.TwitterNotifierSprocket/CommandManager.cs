@@ -72,8 +72,21 @@ namespace Jabbot.TwitterNotifierSprocket
             {
                 return HandleTwitterUserFor();
             }
+            if (_command.Equals("say", StringComparison.OrdinalIgnoreCase))
+            {
+                return HandleSay();
+            }
 
             return false;
+        }
+
+        private bool HandleSay()
+        {
+            if (_message.FromUser == "sethwebster")
+            {
+                _bot.Say(string.Join(" ", _args), _message.Room);
+            }
+            return true;
         }
 
         private bool HandleUserCommand()

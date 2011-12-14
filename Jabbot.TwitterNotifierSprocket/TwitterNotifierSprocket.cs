@@ -41,13 +41,13 @@ namespace Jabbot.TwitterNotifierSprocket
                 {
                     _database.RecordActivity(message.FromUser);
                     InviteUserIfNeccessary(message.FromUser, bot, _database);
-           
+
                     CommandManager mgr = new CommandManager(message, bot, _database);
                     // Try to handle as a command, if that doesn't work
                     // handle as a message -- send notifications where necessary
                     if (!mgr.HandleCommand())
                     {
-                        var twitterUsers = GetUserNamesFromMessage(message.Content,_database);
+                        var twitterUsers = GetUserNamesFromMessage(message.Content, _database);
                         var user = _database.FetchOrCreateUser(message.FromUser);
                         if (twitterUsers.Count() > 0)
                         {
@@ -62,7 +62,7 @@ namespace Jabbot.TwitterNotifierSprocket
                             return true;
                         }
                     }
-                    
+
                 }
             }
             catch (CommandException ce)
@@ -82,9 +82,9 @@ namespace Jabbot.TwitterNotifierSprocket
             svc.AuthenticateWith(ConfigurationManager.AppSettings["User.Token"],
                 ConfigurationManager.AppSettings["User.TokenSecret"]);
             svc.SendTweet(String.Format(_tweetFormat,
-                u.ScreenName, 
+                u.ScreenName,
                 String.IsNullOrEmpty(user.TwitterUserName) ? user.JabbrUserName : user.TwitterUserName, message.Room));
-         
+
         }
 
         private void InviteUserIfNeccessary(string forUser, Bot bot, ITwitterNotifierSprocketRepository _database)
@@ -125,9 +125,38 @@ namespace Jabbot.TwitterNotifierSprocket
 
         private bool ShouldNotifyUser(string UserName, ITwitterNotifierSprocketRepository _database)
         {
+            //TODO: once we figure out why notifications seem low, refactor this debug code out
+            Console.Write("Should Notify User {0}? ", UserName);
             var user = _database.FetchOrCreateUser(UserName);
-            return user == null || (user.EnableNotifications &&
-                ((DateTime.Now - user.LastNotification).TotalMinutes >= 60 &&
+            if (user.EnableNotifications)
+            {
+                if ((DateTime.Now - user.LastNotification).TotalMinutes > 60)
+                {
+                    Console.Write("1 hour check passed, ");
+                    if ((DateTime.Now - user.LastActivity).TotalMinutes > 5)
+                    {
+                        Console.WriteLine("5 minute activity check passed, all passed.");
+                        return true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("5 minute activity check failed, ");
+                    }
+                }
+                else
+                {
+                    Console.Write("1 hour check failed, ");
+                }
+            }
+            else
+            {
+                Console.Write("Notifications are disabled, ");
+            }
+            Console.WriteLine("Not notifying");
+            return false;
+            return (user.EnableNotifications &&
+                (
+                    (DateTime.Now - user.LastNotification).TotalMinutes >= 60 &&
                 (DateTime.Now - user.LastActivity).TotalMinutes > 5));
         }
     }
