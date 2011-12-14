@@ -43,6 +43,8 @@ namespace Jabbot.TwitterNotifierSprocket
                     InviteUserIfNeccessary(message.FromUser, bot, _database);
            
                     CommandManager mgr = new CommandManager(message, bot, _database);
+                    // Try to handle as a command, if that doesn't work
+                    // handle as a message -- send notifications where necessary
                     if (!mgr.HandleCommand())
                     {
                         var twitterUsers = GetUserNamesFromMessage(message.Content,_database);
@@ -53,10 +55,7 @@ namespace Jabbot.TwitterNotifierSprocket
                             {
                                 if (ShouldNotifyUser(u.ScreenName, _database))
                                 {
-                                    TweetSharp.TwitterService svc = new TwitterService(GetClientInfo());
-                                    svc.AuthenticateWith(ConfigurationManager.AppSettings["User.Token"],
-                                        ConfigurationManager.AppSettings["User.TokenSecret"]);
-                                    svc.SendTweet(String.Format(_tweetFormat, u.ScreenName, String.IsNullOrEmpty(user.TwitterUserName) ? user.JabbrUserName : user.TwitterUserName, message.Room));
+                                    NotifyUserOnTwitter(message, user, u);
                                     _database.MarkUserNotified(u.ScreenName);
                                 }
                             }
@@ -75,6 +74,17 @@ namespace Jabbot.TwitterNotifierSprocket
                 bot.PrivateReply(message.FromUser, e.GetBaseException().Message);
             }
             return false;
+        }
+
+        private void NotifyUserOnTwitter(ChatMessage message, User user, TwitterUser u)
+        {
+            TweetSharp.TwitterService svc = new TwitterService(GetClientInfo());
+            svc.AuthenticateWith(ConfigurationManager.AppSettings["User.Token"],
+                ConfigurationManager.AppSettings["User.TokenSecret"]);
+            svc.SendTweet(String.Format(_tweetFormat,
+                u.ScreenName, 
+                String.IsNullOrEmpty(user.TwitterUserName) ? user.JabbrUserName : user.TwitterUserName, message.Room));
+         
         }
 
         private void InviteUserIfNeccessary(string forUser, Bot bot, ITwitterNotifierSprocketRepository _database)
@@ -115,7 +125,7 @@ namespace Jabbot.TwitterNotifierSprocket
 
         private bool ShouldNotifyUser(string UserName, ITwitterNotifierSprocketRepository _database)
         {
-            var user = _database.Users.FirstOrDefault(u => u.JabbrUserName == UserName);
+            var user = _database.FetchOrCreateUser(UserName);
             return user == null || (user.EnableNotifications &&
                 ((DateTime.Now - user.LastNotification).TotalMinutes >= 60 &&
                 (DateTime.Now - user.LastActivity).TotalMinutes > 5));

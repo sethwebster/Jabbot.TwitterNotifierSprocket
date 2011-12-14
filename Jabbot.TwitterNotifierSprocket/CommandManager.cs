@@ -114,7 +114,6 @@ namespace Jabbot.TwitterNotifierSprocket
             return true;
         }
 
-
         private bool HandleTwitterUserFor()
         {
             if (_message.FromUser == "sethwebster")
