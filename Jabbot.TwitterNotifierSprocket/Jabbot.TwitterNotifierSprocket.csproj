@@ -72,6 +72,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BotExtensions.cs" />
     <Compile Include="CommandManager.cs" />
     <Compile Include="Migrations\201112131423552_First.cs" />
     <Compile Include="Migrations\201112131423552_First.Designer.cs">
@@ -96,6 +97,11 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ITwitterNotifierSprocketRepository.cs" />
     <Compile Include="Models\TwitterNotifierSprocketRepository.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="TwitterNotifierSprocket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\UserNotificationModel.cs" />
@@ -106,6 +112,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Readme\EntityFramework.CodeFirst.TestHelpers.README.txt" />
+    <None Include="Resources\HelpText.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

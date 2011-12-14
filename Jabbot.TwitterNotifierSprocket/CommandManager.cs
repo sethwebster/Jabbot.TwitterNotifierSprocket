@@ -32,7 +32,8 @@ namespace Jabbot.TwitterNotifierSprocket
 
         public bool HandleCommand()
         {
-            if (_message.Content.StartsWith("twitterbot") || _message.Content.StartsWith("@twitterbot"))
+            if (_message.Content.StartsWith("twitterbot?") || _message.Content.StartsWith("@twitterbot?") ||
+                _message.Content.StartsWith("@twitterbot"))
             {
                 if (!HandleAdminCommand())
                 {
@@ -237,13 +238,7 @@ namespace Jabbot.TwitterNotifierSprocket
         {
             _bot.PrivateReply(_message.FromUser, "Jabbot Twitter Sprocket - " + Assembly.GetAssembly(this.GetType()).GetName().Version.ToString());
             _bot.PrivateReply(_message.FromUser, string.Format("Status: {0}", _isDisabled ? "Disabled" : "Enabled"));
-            _bot.PrivateReply(_message.FromUser, "Say:");
-            _bot.PrivateReply(_message.FromUser, "twittername [TwitterScreenName] - Displays or Sets your Twitter user name");
-            _bot.PrivateReply(_message.FromUser, "off - turn OFF Twitter notifications when you are mentioned");
-            _bot.PrivateReply(_message.FromUser, "on - turn ON Twitter notifications on for when you are mentioned");
-            _bot.PrivateReply(_message.FromUser, "join [roomname] - ask me to join a room to watch for mentions");
-            _bot.PrivateReply(_message.FromUser, "startup - start me watching for mentions (for everyone)");
-            _bot.PrivateReply(_message.FromUser, "shutdown - stop me from watching for mentions (for everyone)");
+            _bot.PrivateReply(_message.FromUser, Properties.Resources.HelpText);
             return true;
         }
 
