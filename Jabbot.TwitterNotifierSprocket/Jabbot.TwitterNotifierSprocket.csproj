@@ -72,6 +72,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandManager.cs" />
     <Compile Include="Migrations\201112131423552_First.cs" />
     <Compile Include="Migrations\201112131423552_First.Designer.cs">
       <DependentUpon>201112131423552_First.cs</DependentUpon>

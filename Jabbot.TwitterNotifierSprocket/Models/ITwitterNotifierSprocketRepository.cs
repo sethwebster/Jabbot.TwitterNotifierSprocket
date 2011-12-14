@@ -10,5 +10,10 @@ namespace Jabbot.TwitterNotifierSprocket.Models
     {
         IDbSet<User> Users { get; set; }
         int SaveChanges();
+        void RecordActivity(string fromUser);
+        User FetchOrCreateUser(string forUser);
+        bool SetTwitterUserName(string forUser, string twitterUserName);
+        void MarkUserNotified(string UserName);
+
     }
 }
