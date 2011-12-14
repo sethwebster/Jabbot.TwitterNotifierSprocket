@@ -235,7 +235,7 @@ namespace Jabbot.TwitterNotifierSprocket
 
         private bool HandleHelp()
         {
-            _bot.PrivateReply(_message.FromUser, "Jab_bot Twitter Sprocket - " + Assembly.GetAssembly(this.GetType()).GetName().Version.ToString());
+            _bot.PrivateReply(_message.FromUser, "Jabbot Twitter Sprocket - " + Assembly.GetAssembly(this.GetType()).GetName().Version.ToString());
             _bot.PrivateReply(_message.FromUser, string.Format("Status: {0}", _isDisabled ? "Disabled" : "Enabled"));
             _bot.PrivateReply(_message.FromUser, "Say:");
             _bot.PrivateReply(_message.FromUser, "twittername [TwitterScreenName] - Displays or Sets your Twitter user name");
