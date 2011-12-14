@@ -167,86 +167,108 @@ namespace Jabbot.TwitterNotifierSprocket
             var user = FetchOrCreateUser(message.FromUser);
             user.DisableInvites = true;
             _database.SaveChanges();
+            bot.PrivateReply(message.FromUser, "OK - I'll leave you alone.");
             return true;
         }
 
         private bool HandleAdminCommand(string command, string[] args, Bot bot, ChatMessage message)
         {
-            if (message.FromUser == "sethwebster")
+            if (command.Equals("shutdown", StringComparison.OrdinalIgnoreCase))
             {
-                if (command.Equals("shutdown", StringComparison.OrdinalIgnoreCase))
-                {
-                    return HandleShutDown(args, bot, message);
-                }
-                if (command.Equals("startup", StringComparison.OrdinalIgnoreCase))
-                {
-                    return HandleStartUp(args, bot, message);
-                }
-                if (command.Equals("listusers", StringComparison.OrdinalIgnoreCase))
-                {
-                    return HandleListUsers(args, bot, message);
-                }
-                if (command.Equals("twitteruserfor", StringComparison.OrdinalIgnoreCase))
-                {
-                    return HandleTwitterUserFor(args, bot, message);
-                }
+                return HandleShutDown(args, bot, message);
             }
-            else
+            if (command.Equals("startup", StringComparison.OrdinalIgnoreCase))
             {
-                bot.Reply(message.FromUser, "You are not the boss of me!", message.Room);
-                return true;
+                return HandleStartUp(args, bot, message);
             }
+            if (command.Equals("listusers", StringComparison.OrdinalIgnoreCase))
+            {
+                return HandleListUsers(args, bot, message);
+            }
+            if (command.Equals("twitteruserfor", StringComparison.OrdinalIgnoreCase))
+            {
+                return HandleTwitterUserFor(args, bot, message);
+            }
+
             return false;
         }
 
         private bool HandleTwitterUserFor(string[] args, Bot bot, ChatMessage message)
         {
-            if (args.Length == 2)
+            if (message.FromUser == "sethwebster")
             {
-                string forUserName = args[0];
-                string twitterUserName = args[1];
-                var userFor = FetchOrCreateUser(forUserName);
-                if (userFor != null)
+                if (args.Length == 2)
                 {
-                    userFor.TwitterUserName = twitterUserName;
-                    _database.SaveChanges();
-                    bot.PrivateReply(message.FromUser, String.Format("{0}'s twitter user name is now {1}", userFor.JabbrUserName, userFor.TwitterUserName));
+                    string forUserName = args[0];
+                    string twitterUserName = args[1];
+                    var userFor = FetchOrCreateUser(forUserName);
+                    if (userFor != null)
+                    {
+                        userFor.TwitterUserName = twitterUserName;
+                        _database.SaveChanges();
+                        bot.PrivateReply(message.FromUser, String.Format("{0}'s twitter user name is now {1}", userFor.JabbrUserName, userFor.TwitterUserName));
+                    }
+                    else
+                    {
+                        bot.PrivateReply(message.FromUser, String.Format("User {0} was not found", args[0]));
+                    }
                 }
                 else
                 {
-                    bot.PrivateReply(message.FromUser, String.Format("User {0} was not found", args[0]));
+                    bot.PrivateReply(message.FromUser, "twitteruserfor [user] [twitterscreenname]");
                 }
             }
             else
             {
-                bot.PrivateReply(message.FromUser, "twitteruserfor [user] [twitterscreenname]");
+                bot.Reply(message.FromUser, "You're not the boss of me!", message.Room);
             }
             return true;
         }
 
         private bool HandleShutDown(string[] args, Bot bot, ChatMessage message)
         {
-            _isDisabled = true;
-            bot.PrivateReply(message.FromUser, "I have been disabled.");
+            if (message.FromUser == "sethwebster")
+            {
+                _isDisabled = true;
+                bot.PrivateReply(message.FromUser, "I have been disabled.");
+            }
+            {
+                bot.Reply(message.FromUser, "You're not the boss of me!", message.Room);
+            }
             return true;
         }
 
         private bool HandleStartUp(string[] args, Bot bot, ChatMessage message)
         {
-            _isDisabled = false;
+            if (message.FromUser == "sethwebster")
+            {
+                _isDisabled = false;
 
-            bot.PrivateReply(message.FromUser, "I have been enabled.");
+                bot.PrivateReply(message.FromUser, "I have been enabled.");
+            }
+            else
+            {
+                bot.Reply(message.FromUser, "You're not the boss of me!", message.Room);
+            }
             return true;
+
         }
 
         private bool HandleListUsers(string[] args, Bot bot, ChatMessage message)
         {
-            var users = _database.Users.OrderBy(u => u.JabbrUserName).ToArray().Select(
-                u => String.Format(
-                    "{0} <{1}>", u.JabbrUserName,
-                    string.IsNullOrEmpty(u.TwitterUserName) ? "empty" : "@" + u.TwitterUserName)
-                );
-            bot.PrivateReply(message.FromUser, String.Join(", ", users.ToArray()));
+            if (message.FromUser == "sethwebster")
+            {
+                var users = _database.Users.OrderBy(u => u.JabbrUserName).ToArray().Select(
+                    u => String.Format(
+                        "{0} <{1}>", u.JabbrUserName,
+                        string.IsNullOrEmpty(u.TwitterUserName) ? "empty" : "@" + u.TwitterUserName)
+                    );
+                bot.PrivateReply(message.FromUser, String.Join(", ", users.ToArray()));
+            }
+            else
+            {
+                bot.Reply(message.FromUser, "You're not the boss of me!", message.Room);
+            }
             return true;
         }
 

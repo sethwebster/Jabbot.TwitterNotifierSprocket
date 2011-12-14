@@ -23,5 +23,10 @@ namespace Jabbot.TwitterNotifierSprocket.Models
         public DateTime LastActivity { get; set; }
         public DateTime LastInviteDate { get; set; }
         public bool DisableInvites { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("{0} <{1}>", JabbrUserName, TwitterUserName);
+        }
     }
 }
