@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Jabbot.Sprockets;
-using System.Text.RegularExpressions;
-using TweetSharp;
 using System.Configuration;
-using System.Collections.ObjectModel;
-using Jabbot.TwitterNotifierSprocket.Models;
-using Jabbot.Models;
-using System.Reflection;
-using System.Data.Entity;
 using System.Data.Entity.Migrations;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Jabbot.Models;
+using Jabbot.Sprockets;
+using Jabbot.TwitterNotifierSprocket.Models;
+using TweetSharp;
 
 namespace Jabbot.TwitterNotifierSprocket
 {
@@ -41,33 +37,21 @@ namespace Jabbot.TwitterNotifierSprocket
                 {
                     _database.RecordActivity(message.FromUser);
                     InviteUserIfNeccessary(message.FromUser, bot, _database);
-
-                    CommandManager mgr = new CommandManager(message, bot, _database);
-                    // Try to handle as a command, if that doesn't work
-                    // handle as a message -- send notifications where necessary
-                    if (!mgr.HandleCommand())
+                    var twitterUsers = GetUserNamesFromMessage(message.Content, _database);
+                    var user = _database.FetchOrCreateUser(message.FromUser);
+                    if (twitterUsers.Count() > 0)
                     {
-                        var twitterUsers = GetUserNamesFromMessage(message.Content, _database);
-                        var user = _database.FetchOrCreateUser(message.FromUser);
-                        if (twitterUsers.Count() > 0)
+                        foreach (var u in twitterUsers)
                         {
-                            foreach (var u in twitterUsers)
+                            if (ShouldNotifyUser(u.ScreenName, _database))
                             {
-                                if (ShouldNotifyUser(u.ScreenName, _database))
-                                {
-                                    NotifyUserOnTwitter(message, user, u);
-                                    _database.MarkUserNotified(u.ScreenName);
-                                }
+                                NotifyUserOnTwitter(message, user, u);
+                                _database.MarkUserNotified(u.ScreenName);
                             }
-                            return true;
                         }
+                        return true;
                     }
-
                 }
-            }
-            catch (CommandException ce)
-            {
-                bot.PrivateReply(message.FromUser, ce.Message);
             }
             catch (Exception e)
             {
@@ -158,15 +142,6 @@ namespace Jabbot.TwitterNotifierSprocket
                 (
                     (DateTime.Now - user.LastNotification).TotalMinutes >= 60 &&
                 (DateTime.Now - user.LastActivity).TotalMinutes > 5));
-        }
-    }
-
-    public class CommandException : Exception
-    {
-        public CommandException(string Message)
-            : base(Message)
-        {
-
         }
     }
 }

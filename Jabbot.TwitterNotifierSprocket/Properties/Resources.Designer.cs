@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Jabbot.TwitterNotifierSprocket.Properties {
-    using System;
-    
-    
+namespace Jabbot.TwitterNotifierSprocket.Properties
+{
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
