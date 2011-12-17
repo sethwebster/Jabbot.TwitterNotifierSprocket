@@ -13,12 +13,12 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
 
         public override bool ExecuteCommand()
         {
-            var users = _database.Users.OrderBy(u => u.JabbrUserName).ToArray().Select(
+            var users = Database.Users.OrderBy(u => u.JabbrUserName).ToArray().Select(
                    u => String.Format(
                        "{0} <{1}>", u.JabbrUserName,
                        string.IsNullOrEmpty(u.TwitterUserName) ? "empty" : "@" + u.TwitterUserName)
                    );
-            Bot.PrivateReply(CurrentMessage.FromUser, String.Join(", ", users.ToArray()));
+            Bot.PrivateReply(CurrentMessage.FromUser, String.Join(Environment.NewLine, users.ToArray()));
             return true;
         }
     }

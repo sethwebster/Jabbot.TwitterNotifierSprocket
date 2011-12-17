@@ -17,11 +17,11 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
             {
                 string forUserName = this.CurrentArguments[0];
                 string twitterUserName = this.CurrentArguments[1];
-                var userFor = _database.FetchOrCreateUser(forUserName);
+                var userFor = Database.FetchOrCreateUser(forUserName);
                 if (userFor != null)
                 {
                     userFor.TwitterUserName = twitterUserName;
-                    _database.SaveChanges();
+                    Database.SaveChanges();
                     Bot.PrivateReply(CurrentMessage.FromUser, String.Format("{0}'s twitter user name is now {1}", userFor.JabbrUserName, userFor.TwitterUserName));
                 }
                 else

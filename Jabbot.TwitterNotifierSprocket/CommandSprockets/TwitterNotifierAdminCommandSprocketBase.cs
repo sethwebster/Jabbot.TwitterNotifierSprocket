@@ -6,12 +6,17 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
 {
     public abstract class TwitterNotifierAdminCommandSprocketBase : RestrictedCommandSprocket
     {
-        protected ITwitterNotifierSprocketRepository _database;
+        protected ITwitterNotifierSprocketRepository Database { get; private set; }
 
         public TwitterNotifierAdminCommandSprocketBase()
             : this(new TwitterNotifierSprocketRepository())
         {
 
+        }
+
+        public TwitterNotifierAdminCommandSprocketBase(ITwitterNotifierSprocketRepository database)
+        {
+            Database = database;
         }
 
         public override IEnumerable<string> SupportedInitiators
@@ -24,11 +29,7 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
             }
         }
 
-        public TwitterNotifierAdminCommandSprocketBase(ITwitterNotifierSprocketRepository database)
-        {
-            _database = database;
-        }
-
+        
         public override IEnumerable<string> AllowedUserList
         {
             get
