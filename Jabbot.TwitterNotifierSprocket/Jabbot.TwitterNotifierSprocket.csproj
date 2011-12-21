@@ -108,8 +108,13 @@
     <Compile Include="Migrations\201112132059098_remove-new-field.Designer.cs">
       <DependentUpon>201112132059098_remove-new-field.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201112201417447_added-occupied-rooms.cs" />
+    <Compile Include="Migrations\201112201417447_added-occupied-rooms.Designer.cs">
+      <DependentUpon>201112201417447_added-occupied-rooms.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ITwitterNotifierSprocketRepository.cs" />
+    <Compile Include="Models\OccupiedRoom.cs" />
     <Compile Include="Models\TwitterNotifierSprocketRepository.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -125,6 +130,7 @@
     <Compile Include="Models\UserNotificationModel.cs" />
     <Compile Include="CommandSprockets\TwitterNotifierCommandSprocketBase.cs" />
     <Compile Include="CommandSprockets\TwitterUserForCommandSprocket.cs" />
+    <Compile Include="TwitterNotifierSprocketInitializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

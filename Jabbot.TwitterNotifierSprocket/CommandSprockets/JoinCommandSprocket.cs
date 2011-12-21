@@ -12,20 +12,21 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
 
         public override bool ExecuteCommand()
         {
-            if (CurrentArguments.Length == 0)
+            if (Arguments.Length == 0)
             {
-                Bot.PrivateReply(CurrentMessage.FromUser, "You must specify a room to join");
+                Bot.PrivateReply(Message.FromUser, "You must specify a room to join");
             }
             else
             {
                 try
                 {
-                    Bot.Join(CurrentArguments[0]);
-                    Bot.PrivateReply(CurrentMessage.FromUser, "OK - I'm now in " + CurrentArguments[0]);
+                    Bot.Join(Arguments[0]);
+                    Database.JoinRoom(Arguments[0], Message.FromUser);
+                    Bot.PrivateReply(Message.FromUser, "OK - I'm now in " + Arguments[0]);
                 }
                 catch (Exception e)
                 {
-                    Bot.PrivateReply(CurrentMessage.FromUser, e.GetBaseException().Message);
+                    Bot.PrivateReply(Message.FromUser, e.GetBaseException().Message);
                 }
             }
             return true;

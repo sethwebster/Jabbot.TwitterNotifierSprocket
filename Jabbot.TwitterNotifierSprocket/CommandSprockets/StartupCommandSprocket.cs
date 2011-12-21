@@ -12,7 +12,7 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
         public override bool ExecuteCommand()
         {
             TwitterNotifierBotStateManager.IsDisabled = false;
-            Bot.PrivateReply(CurrentMessage.FromUser, "I have been enabled.");
+            Bot.PrivateReply(Message.FromUser, "I have been enabled.");
             return true;
         }
     }

@@ -16,9 +16,9 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
 
         public override bool ExecuteCommand()
         {
-            Bot.PrivateReply(CurrentMessage.FromUser, "Jabbot Twitter Sprocket - " + Assembly.GetAssembly(this.GetType()).GetName().Version.ToString());
-            Bot.PrivateReply(CurrentMessage.FromUser, string.Format("Status: {0}", TwitterNotifierBotStateManager.IsDisabled ? "Disabled" : "Enabled"));
-            Bot.PrivateReply(CurrentMessage.FromUser, Properties.Resources.HelpText);
+            Bot.PrivateReply(Message.FromUser, "Jabbot Twitter Sprocket - " + Assembly.GetAssembly(this.GetType()).GetName().Version.ToString());
+            Bot.PrivateReply(Message.FromUser, string.Format("Status: {0}", TwitterNotifierBotStateManager.IsDisabled ? "Disabled" : "Enabled"));
+            Bot.PrivateReply(Message.FromUser, Properties.Resources.HelpText);
             return true;
         }
     }

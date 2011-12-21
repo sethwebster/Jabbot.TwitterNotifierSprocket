@@ -11,10 +11,10 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
 
         public override bool ExecuteCommand()
         {
-            var user = Database.FetchOrCreateUser(CurrentMessage.FromUser);
+            var user = Database.FetchOrCreateUser(Message.FromUser);
             user.EnableNotifications = false;
             Database.SaveChanges();
-            Bot.PrivateReply(CurrentMessage.FromUser, "Twitter notifications have been enabled");
+            Bot.PrivateReply(Message.FromUser, "Twitter notifications have been enabled");
             return true;
         }
     }

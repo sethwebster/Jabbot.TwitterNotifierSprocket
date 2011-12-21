@@ -11,10 +11,10 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
 
         public override bool ExecuteCommand()
         {
-            var user = Database.FetchOrCreateUser(CurrentMessage.FromUser);
+            var user = Database.FetchOrCreateUser(Message.FromUser);
             user.DisableInvites = true;
             Database.SaveChanges();
-            Bot.PrivateReply(CurrentMessage.FromUser, "OK - I'll leave you alone.");
+            Bot.PrivateReply(Message.FromUser, "OK - I'll leave you alone.");
             return true;
         }
     }

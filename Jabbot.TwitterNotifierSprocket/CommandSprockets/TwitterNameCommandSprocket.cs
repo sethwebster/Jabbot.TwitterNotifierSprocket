@@ -17,15 +17,15 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
         {
             if (!HasArguments)
             {
-                var user = Database.FetchOrCreateUser(CurrentMessage.FromUser);
-                Bot.PrivateReply(CurrentMessage.FromUser, String.Format("Your Twitter user is {0}",
+                var user = Database.FetchOrCreateUser(Message.FromUser);
+                Bot.PrivateReply(Message.FromUser, String.Format("Your Twitter user is {0}",
                     String.IsNullOrEmpty(user.TwitterUserName) ? "<empty>" : user.TwitterUserName));
 
             }
             else
             {
-                Database.SetTwitterUserName(CurrentMessage.FromUser, CurrentArguments[0]);
-                Bot.PrivateReply(CurrentMessage.FromUser, String.Format("Your Twitter user name is now {0}", CurrentArguments[0]));
+                Database.SetTwitterUserName(Message.FromUser, Arguments[0]);
+                Bot.PrivateReply(Message.FromUser, String.Format("Your Twitter user name is now {0}", Arguments[0]));
             }
             return true;
         }

@@ -13,7 +13,7 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
         {
 
             TwitterNotifierBotStateManager.IsDisabled = true;
-            Bot.PrivateReply(CurrentMessage.FromUser, "I have been disabled.");
+            Bot.PrivateReply(Message.FromUser, "I have been disabled.");
             return true;
         }
     }

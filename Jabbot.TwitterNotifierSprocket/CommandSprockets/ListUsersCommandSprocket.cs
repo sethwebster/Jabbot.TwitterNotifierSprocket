@@ -18,7 +18,7 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
                        "{0} <{1}>", u.JabbrUserName,
                        string.IsNullOrEmpty(u.TwitterUserName) ? "empty" : "@" + u.TwitterUserName)
                    );
-            Bot.PrivateReply(CurrentMessage.FromUser, String.Join(Environment.NewLine, users.ToArray()));
+            Bot.PrivateReply(Message.FromUser, String.Join(Environment.NewLine, users.ToArray()));
             return true;
         }
     }

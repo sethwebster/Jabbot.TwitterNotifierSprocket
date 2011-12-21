@@ -7,6 +7,7 @@ namespace Jabbot.TwitterNotifierSprocket.Models
     public class TwitterNotifierSprocketRepository : DbContext, ITwitterNotifierSprocketRepository
     {
         public virtual IDbSet<User> Users { get; set; }
+        public virtual IDbSet<OccupiedRoom> OccupiedRooms { get; set; }
 
         public void RecordActivity(string fromUser)
         {
@@ -54,5 +55,20 @@ namespace Jabbot.TwitterNotifierSprocket.Models
             this.SaveChanges();
         }
 
+        public void JoinRoom(string roomName, string requestingUser)
+        {
+            var _existing = this.OccupiedRooms
+                .FirstOrDefault(r => r.Name.Equals(roomName, StringComparison.OrdinalIgnoreCase)) != null;
+            if (!_existing)
+            {
+                this.OccupiedRooms.Add(new OccupiedRoom()
+                    {
+                        Name = roomName,
+                        UserNameRequesting = requestingUser,
+                        DateJoined = DateTime.UtcNow
+                    });
+                this.SaveChanges();
+            }
+        }
     }
 }
