@@ -78,8 +78,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandSprockets\FollowCommandSprocket.cs" />
     <Compile Include="CommandSprockets\PurgeEmptiesCommandSprocket.cs" />
-    <Compile Include="CommandSprockets\EmptyCommandSprocket.cs" />
+    <Compile Include="CommandSprockets\UnknownCommandSprocket.cs" />
     <Compile Include="CommandSprockets\DisableInviteCommandSprocket.cs" />
     <Compile Include="CommandSprockets\JoinCommandSprocket.cs" />
     <Compile Include="CommandSprockets\OffCommandSprocket.cs" />
