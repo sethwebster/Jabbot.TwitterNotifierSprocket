@@ -7,8 +7,7 @@ namespace Jabbot.TwitterNotifierSprocket.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = true;
-
+            AutomaticMigrationsEnabled = false;
             // Seed data: 
             //   Override the Seed method in this class to add seed data.
             //    - The Seed method will be called after migrating to the latest version.
