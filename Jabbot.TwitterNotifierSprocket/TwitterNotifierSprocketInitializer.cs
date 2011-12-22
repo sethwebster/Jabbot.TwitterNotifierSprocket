@@ -6,6 +6,7 @@ using Jabbot.Sprockets;
 using Jabbot.TwitterNotifierSprocket.Models;
 using Jabbot.TwitterNotifierSprocket.Migrations;
 using System.Data.Entity.Migrations;
+using Jabbot.Sprockets.Core;
 
 namespace Jabbot.TwitterNotifierSprocket
 {
@@ -29,6 +30,11 @@ namespace Jabbot.TwitterNotifierSprocket
         public void Initialize(Bot bot)
         {
             DoMigrations();
+
+            if (!String.IsNullOrEmpty(System.Configuration.ConfigurationManager.AppSettings["Application.Gravatar"]))
+            {
+                bot.Gravatar(System.Configuration.ConfigurationManager.AppSettings["Application.Gravatar"]);
+            }
             foreach (var r in this._database.OccupiedRooms)
             {
                 bot.Join(r.Name);

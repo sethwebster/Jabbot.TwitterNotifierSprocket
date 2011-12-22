@@ -8,6 +8,7 @@ using Jabbot.Models;
 using Jabbot.Sprockets;
 using Jabbot.TwitterNotifierSprocket.Models;
 using TweetSharp;
+using Jabbot.Sprockets.Core;
 
 namespace Jabbot.TwitterNotifierSprocket
 {
@@ -15,8 +16,6 @@ namespace Jabbot.TwitterNotifierSprocket
     {
         private static readonly Regex _usernameMatchRegex = new Regex(@"(@\w+)");
         private static readonly string _tweetFormat = "@{0}, you were just mentioned by @{1} here http://jabbr.net/#/rooms/{2}.";
-
-        private bool _isDisabled = false;
 
         private void DoMigrations()
         {
