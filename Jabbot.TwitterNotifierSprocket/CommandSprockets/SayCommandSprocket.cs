@@ -2,7 +2,7 @@
 
 namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
 {
-    public class SayCommandSprocket : TwitterNotifierAdminCommandSprocketBase
+    public class SayCommandSprocket : TwitterNotifierCommandSprocketBase
     {
         public override IEnumerable<string> SupportedCommands
         {
