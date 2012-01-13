@@ -1,7 +1,16 @@
-Say:
+-- Usage --
+
+usage - @twitterbot? commands [arguments]
+
+-- Commands --
+
 twittername [TwitterScreenName] - Displays or Sets your Twitter user name
 off - turn OFF Twitter notifications when you are mentioned
 on - turn ON Twitter notifications on for when you are mentioned
 join [roomname] - ask me to join a room to watch for mentions
+say [message] - Say [message] on your behalf
+sayin [roomname] [message] - say [message] in [roomname] on you behalf
+
+-- Admin Commands --
 startup - start me watching for mentions (for everyone)
 shutdown - stop me from watching for mentions (for everyone)

@@ -80,6 +80,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandSprockets\SayInCommandSprocket.cs" />
     <Compile Include="CommandSprockets\FollowCommandSprocket.cs" />
     <Compile Include="CommandSprockets\PurgeEmptiesCommandSprocket.cs" />
     <Compile Include="CommandSprockets\UnknownCommandSprocket.cs" />
