@@ -56,7 +56,7 @@
       <HintPath>..\references\Jabbot.CommandSprockets.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.4.0.5\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.4.5.1\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SignalR.Client">
       <HintPath>..\references\SignalR.Client.dll</HintPath>
