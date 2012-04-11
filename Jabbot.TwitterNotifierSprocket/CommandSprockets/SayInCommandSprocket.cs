@@ -16,7 +16,7 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
             if (Arguments.Length == 0)
                 throw new InvalidOperationException("You must provide a room name");
             string room = Arguments[0];
-            Bot.Say(string.Join(" ", Arguments.Skip(1).ToArray()), room);
+            Bot.Send(string.Join(" ", Arguments.Skip(1).ToArray()), room);
             return true;
         }
     }

@@ -11,7 +11,7 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
         
         public override bool ExecuteCommand()
         {
-            Bot.Say(string.Join(" ", Arguments), Message.Room);
+            Bot.Send(string.Join(" ", Arguments), Message.Room);
             return true;
         }
     }

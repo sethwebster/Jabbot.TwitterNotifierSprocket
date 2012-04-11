@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using Jabbot.Sprockets;
 using Jabbot.TwitterNotifierSprocket.Models;
-using Jabbot.TwitterNotifierSprocket.Migrations;
-using System.Data.Entity.Migrations;
 using Jabbot.Sprockets.Core;
+using Jabbot.Core;
+using System.Data.Entity;
+using Jabbot.TwitterNotifierSprocket.Migrations;
 
 namespace Jabbot.TwitterNotifierSprocket
 {
@@ -18,7 +19,7 @@ namespace Jabbot.TwitterNotifierSprocket
         public TwitterNotifierSprocketInitializer()
             : this(new TwitterNotifierSprocketRepository())
         {
-
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<TwitterNotifierSprocketRepository, Configuration>());
         }
 
         public TwitterNotifierSprocketInitializer(ITwitterNotifierSprocketRepository database)
@@ -27,17 +28,16 @@ namespace Jabbot.TwitterNotifierSprocket
         }
 
 
-        public void Initialize(Bot bot)
+        public void Initialize(IBot bot)
         {
-            DoMigrations();
-
+            DoMigrations();            
             if (!String.IsNullOrEmpty(System.Configuration.ConfigurationManager.AppSettings["Application.Gravatar"]))
             {
-                bot.Gravatar(System.Configuration.ConfigurationManager.AppSettings["Application.Gravatar"]);
+                //bot.Gravatar(System.Configuration.ConfigurationManager.AppSettings["Application.Gravatar"]);
             }
             foreach (var r in this._database.OccupiedRooms)
             {
-                bot.Join(r.Name);
+                bot.JoinRoom(r.Name);
             }
         }
 
@@ -54,9 +54,9 @@ namespace Jabbot.TwitterNotifierSprocket
             //}
 
             // Only run migrations for SQL server (Sql ce not supported as yet)
-            var settings = new Configuration();
-            var migrator = new DbMigrator(settings);
-            migrator.Update();
+            //var settings = new Configuration();
+            //var migrator = new DbMigrator(settings);
+            //migrator.Update();
         }
 
     }

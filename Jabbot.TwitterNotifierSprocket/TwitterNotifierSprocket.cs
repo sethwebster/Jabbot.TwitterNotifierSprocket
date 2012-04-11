@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Jabbot.Models;
@@ -9,6 +8,7 @@ using Jabbot.Sprockets;
 using Jabbot.TwitterNotifierSprocket.Models;
 using TweetSharp;
 using Jabbot.Sprockets.Core;
+using Jabbot.Core;
 
 namespace Jabbot.TwitterNotifierSprocket
 {
@@ -21,14 +21,9 @@ namespace Jabbot.TwitterNotifierSprocket
         {
             // Get the Jabbr connection string
             var connectionString = ConfigurationManager.ConnectionStrings["Jabbr"];
-
-            // Only run migrations for SQL server (Sql ce not supported as yet)
-            var settings = new Migrations.Configuration();
-            var migrator = new DbMigrator(settings);
-            migrator.Update();
         }
 
-        public bool Handle(ChatMessage message, Bot bot)
+        public bool Handle(ChatMessage message, IBot bot)
         {
             try
             {
@@ -70,7 +65,7 @@ namespace Jabbot.TwitterNotifierSprocket
 
         }
 
-        private void InviteUserIfNeccessary(string forUser, Bot bot, ITwitterNotifierSprocketRepository _database)
+        private void InviteUserIfNeccessary(string forUser, IBot bot, ITwitterNotifierSprocketRepository _database)
         {
             var user = _database.FetchOrCreateUser(forUser);
             if (String.IsNullOrWhiteSpace(user.TwitterUserName) &&

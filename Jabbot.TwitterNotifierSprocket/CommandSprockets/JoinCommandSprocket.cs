@@ -20,7 +20,7 @@ namespace Jabbot.TwitterNotifierSprocket.CommandSprockets
             {
                 try
                 {
-                    Bot.Join(Arguments[0]);
+                    Bot.JoinRoom(Arguments[0]);
                     Database.JoinRoom(Arguments[0], Message.FromUser);
                     Bot.PrivateReply(Message.FromUser, "OK - I'm now in " + Arguments[0]);
                 }
